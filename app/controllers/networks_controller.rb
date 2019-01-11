@@ -1,12 +1,5 @@
 class NetworksController < ApplicationController
 
-  respond_to :html, :json
-  def index
-    @networks = Network.all
-    render json: @networks
-
-  end
-
   def update_networks
     response = HTTParty.get('http://api.citybik.es/v2/networks')
 

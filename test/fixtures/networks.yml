@@ -1,15 +1,15 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  id: MyString
-  href: MyString
-  city: MyString
+  id: 1
+  href: /denver
+  city: denver
   latitude: 
   longitude: 
 
 two:
-  id: MyString
-  href: MyString
-  city: MyString
+  id: 2
+  href: /warsaw
+  city: warsaw
   latitude: 
   longitude: 
