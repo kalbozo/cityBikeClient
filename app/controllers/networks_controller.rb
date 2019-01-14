@@ -8,7 +8,7 @@ class NetworksController < ApplicationController
       networks = JSON.parse(response.body)
       networks['networks'].each do |network|
         #begin
-          network_model = Network.where(:href => network['href']).first_or_create!
+          network_model = Network.where(href: network['href']).first_or_create!
           Network.update(network_model.id, :city => network['location']['city'], :longitude => network['location']['longitude'], :latitude => network['location']['latitude'],:name=> network['id'])
           
         #rescue
