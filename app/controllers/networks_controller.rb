@@ -1,6 +1,7 @@
 class NetworksController < ApplicationController
 
   def update_networks
+    current_time = Time.now
     response = HTTParty.get('http://api.citybik.es/v2/networks')
 
     if response.success?
@@ -13,6 +14,8 @@ class NetworksController < ApplicationController
           next
         end
       end
+      #destroy all non-updated networks. This means they didnt exist on the api
+      Network.destroy_all("updated_at < ?", current_time)
     else
       raise response.response
     end
