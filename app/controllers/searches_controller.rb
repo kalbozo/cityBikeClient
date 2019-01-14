@@ -1,6 +1,7 @@
 class SearchesController < ApplicationController
     def networks
         if(params.has_key? :city)
+            params[:city].downcase!
             search = Search.where(:city => params[:city]).first
             #if the search was ran already within the last 15min then use cached data
             unless (search.nil?) || (search.updated_at < 15.minute.ago)
@@ -16,6 +17,7 @@ class SearchesController < ApplicationController
     end
     def stations
         if(params.has_key? :city)
+            params[:city].downcase!
             search = Search.where(:city => params[:city]).first
             #if the search was ran already within the last 15min then use cached network data
             unless (search.nil?) || (search.updated_at < 15.minute.ago)
