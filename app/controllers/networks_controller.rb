@@ -1,20 +1,21 @@
 class NetworksController < ApplicationController
 
-  respond_to :html, :json
-  def index
-    @networks = Network.all
-    render json: @networks
-
-  end
-
   def update_networks
+    current_time = Time.now
     response = HTTParty.get('http://api.citybik.es/v2/networks')
 
     if response.success?
       networks = JSON.parse(response.body)
       networks['networks'].each do |network|
-        Network.create([{:name=> network['id'], :href => network['href'], :city => network['location']['city'], :longitude => network['location']['longitude'], :latitude => network['location']['latitude']}])
-      end 
+        begin
+          networkModel = Network.where(:href => network['href']).first_or_create
+          Network.update(networkModel.id, :city => network['location']['city'], :longitude => network['location']['longitude'], :latitude => network['location']['latitude'],:name=> network['id'])
+        rescue
+          next
+        end
+      end
+      #destroy all non-updated networks. This means they didnt exist on the api
+      Network.destroy_all("updated_at < ?", current_time)
     else
       raise response.response
     end
