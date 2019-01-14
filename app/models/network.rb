@@ -1,11 +1,10 @@
 class Network < ApplicationRecord
-    #attr_accessor :href, :name, :city
     validates :href, presence: true
     validates :city, presence: true
     has_and_belongs_to_many :searches, required: false
 
     before_save {
-        name.downcase!
-        city.downcase!
+        #puts JSON.parse(self)
+        self.city.downcase!
     }
 end
