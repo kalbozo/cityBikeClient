@@ -15,7 +15,7 @@ class NetworksController < ApplicationController
         end
       end
       #destroy all non-updated networks. This means they didnt exist on the api
-      Network.destroy_all("updated_at < ?", current_time)
+      Network.where("updated_at < ?", current_time).destroy_all
     else
       raise response.response
     end
