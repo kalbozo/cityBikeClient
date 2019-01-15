@@ -17,6 +17,9 @@ class SearchesController < ApplicationController
                 end
                 render json: @networks
             end
+        else
+            @output = {:error => "No city specified"}
+            render json: @output
         end
     end
     def stations
@@ -33,7 +36,7 @@ class SearchesController < ApplicationController
                 search.networks = networks
                 search.touch #update the updated_at field
             end
-            @stations = []
+            @output = []
             if networks
                 networks.collect { |network|
                     # Since I am not caching stations yet, we must grab them from the server
@@ -41,20 +44,20 @@ class SearchesController < ApplicationController
                     if response.success?
                         station_array = JSON.parse(response.body)['network']['stations']
                         station_array.each do |station|
-                           @stations.push(station)
+                           @output.push(station)
                         end
                     else
-                        raise response.response
+                        @output = {:error => "External API failure"}
+                        break
                     end
                 }
             end
             if(params[:sort].present?)
-                @stations.sort_by!{|x| x[params[:sort]]}
+                @output.sort_by!{|x| x[params[:sort]]}
             end
-            render json: @stations
         else
             @output = {:error => "No city specified"}
-            render json: @output
         end
+        render json: @output
     end
 end
