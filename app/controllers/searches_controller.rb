@@ -1,6 +1,7 @@
 class SearchesController < ApplicationController
     def networks
-        if(params.has_key? :city)
+        if(params[:city].present?)
+            #ensure that we only submit lowercase citys. (Cross platform case insensitive)
             params[:city].downcase!
             search = Search.where(:city => params[:city]).first
             #if the search was ran already within the last 15min then use cached data
@@ -11,12 +12,16 @@ class SearchesController < ApplicationController
                 @networks = Network.where('city LIKE ?', params[:city]+"%")
                 search.networks = @networks
                 search.touch #update the updated_at field
+                if(params[:sort].present?)
+                    @networks.sort_by!{|x| x[params[:sort]]}
+                end
                 render json: @networks
             end
         end
     end
     def stations
-        if(params.has_key? :city)
+        if(params[:city].present?)
+           #ensure that we only submit lowercase citys. (Cross platform case insensitive)
             params[:city].downcase!
             search = Search.where(:city => params[:city]).first
             #if the search was ran already within the last 15min then use cached network data
@@ -31,15 +36,25 @@ class SearchesController < ApplicationController
             @stations = []
             if networks
                 networks.collect { |network|
-                    response = HTTParty.get('http://api.citybik.es/'+network['href'])
+                    # Since I am not caching stations yet, we must grab them from the server
+                    response = HTTParty.get('http://api.citybik.es/'+network['href']+'?fields=stations')
                     if response.success?
-                        @stations.push(JSON.parse(response.body))
+                        station_array = JSON.parse(response.body)['network']['stations']
+                        station_array.each do |station|
+                           @stations.push(station)
+                        end
                     else
                         raise response.response
                     end
                 }
             end
+            if(params[:sort].present?)
+                @stations.sort_by!{|x| x[params[:sort]]}
+            end
             render json: @stations
+        else
+            @output = {:error => "No city specified"}
+            render json: @output
         end
     end
 end
