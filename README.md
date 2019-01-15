@@ -5,15 +5,19 @@ To run a query you have two options:
 /search?[params] 
 /stations?[params]
 
-ex: https://client-bike-api.herokuapp.com/stations?city=denver
+ex: https://client-bike-api.herokuapp.com/stations?city=denver&sort=free_bikes
 
-Search will return a list of networks based on your criteria. (Currently only 'city' is supported as a param)
-Search caches a list of networks for 15min, so repeated searches of the same city will return much quicker.
 
-Stations will return a large list of all Bike stations in the specified city. (Currently only 'city' is supported)
-Stations will also cache the networks portion of the search, but station caching is not yet implemented. Adding this functionality would be very similiar to networks, with the additional association of searches -> networks -> stations
+'city' is a required parameter. There is no 'get all' for this api as that would be a very large set of data.
+'sort' is optional, but will sort on the following criteria for stations:
+       name
+       timestamp
+       longitude
+       latitude
+       empty_slots
+       free_bikes
+       id
+       href
+       
+note that some sorts will not apply to both apis entry points. If a parameter does not exist, sort defaults to what the api responded with.
 
-PLEASE NOTE: 
-
- While developing this api, it was discovered that the cityBikes api: http://api.citybik.es/v2/
- occasionally ignores any filtering you have requested. This causes sorting to fail due to multileveled JSON being unexpectedly returned from the external source. This could be handled given more time, but since this is a simple project it was ignored.
